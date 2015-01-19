@@ -77,9 +77,10 @@ int SIM900Client::internalConnect2(uint16_t port) {
  */
 int SIM900Client::connect(IPAddress ip, uint16_t port)
 { 
-	internalConnect1();
-	//ip.printTo(_gprs->_cell); //FIX
-	return internalConnect2(port);
+  internalConnect1();
+  //ip.printTo(_gprs->cell);
+  _gprs->_cell->print(ip);
+  return internalConnect2(port);
 }
 
 /**
