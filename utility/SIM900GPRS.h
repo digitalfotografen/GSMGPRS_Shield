@@ -2,7 +2,11 @@
 #define sim900gprs_h
 #include "GPRS.h"
 
-#define SIM900_GPRS_VERSION F("v0.1")
+#define SIM900_GPRS_VERSION F("v0.1_Serial")
+
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+     #define USE_HW_SERIAL
+#endif
 
 #define GSM_ON_PIN             9 // connect GSM Module turn ON to pin 77 
 #define GSM_RESET_PIN          8 // connect GSM Module RESET to pin 35
@@ -28,7 +32,11 @@ protected:
 	ConnectionStatus_t getConnectionStatus();
 	
 public:
+#ifndef USE_HW_SERIAL
 	SIM900GPRS(long baudrate=9600, int gprsBoardRXPin=7, int gprsBoardTXPin=8);
+#else
+	SIM900GPRS(long baudrate=9600);
+#endif
 
 	NetworkStatus_t begin(char* pin=NULL, bool restart=true);
 	

@@ -3,7 +3,12 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
-#define GSM_LIB_VERSION F("v0.1")
+#define GSM_LIB_VERSION F("v0.1_Serial1")
+
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+     #define USE_HW_SERIAL
+#endif
+
 
 #define RESPONSE_BUFFER_SIZE 40 // enough to get modem response
 #define TIMEOUT 1000 //Default time out, 1 second
@@ -28,8 +33,12 @@ enum NetworkStatus_t {
 class GSM {
 
 protected:
-	HardwareSerial *_cell;
-//	SoftwareSerial _cell;
+#ifndef USE_HW_SERIAL
+  SoftwareSerial _softwareSerial;
+  SoftwareSerial *_cell;
+#else
+  HardwareSerial *_cell;
+#endif
 	char _internalBuffer[RESPONSE_BUFFER_SIZE];
 	char* _buffer = _internalBuffer;
 	int _bufferIndex = 0;

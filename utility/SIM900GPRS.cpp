@@ -26,10 +26,14 @@ const char * const connectionStatusStrings[] PROGMEM =
 		pdp_deact 
 };
 
+#ifndef USE_HW_SERIAL
 SIM900GPRS::SIM900GPRS(long baudrate, int gprsBoardRXPin, int gprsBoardTXPin) {
+  _cell = &_softwareSerial;
+#else
+SIM900GPRS::SIM900GPRS(long baudrate) {
   _cell = &Serial1;
-//	_cell = SoftwareSerial(gprsBoardRXPin, gprsBoardTXPin);
-	_cell->begin(baudrate);
+#endif
+  _cell->begin(baudrate);
 }
 
 /**

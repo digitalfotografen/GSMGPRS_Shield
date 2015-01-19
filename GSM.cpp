@@ -4,11 +4,16 @@
 #define GSM_RXPIN 7
 #define GSM_TXPIN 8
 
-//GSM::GSM():_cell(GSM_TXPIN, GSM_RXPIN) {
-GSM::GSM() {
+
+#ifndef USE_HW_SERIAL
+GSM::GSM():_softwareSerial(GSM_TXPIN, GSM_RXPIN) {
+  _cell = &_softwareSerial;
+#else
+  GSM::GSM() {
   _cell = &Serial1;
-	_bufferSize = RESPONSE_BUFFER_SIZE;
-	_status = CONNECTING;
+#endif
+  _bufferSize = RESPONSE_BUFFER_SIZE;
+  _status = CONNECTING;
 }
 
 void GSM::setBuffer(char * buffer, int size) {
