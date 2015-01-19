@@ -27,10 +27,10 @@ uint8_t GPRSClient::connected()
  * byte - write() returns the number of bytes written.
  */
 size_t GPRSClient::write(uint8_t b) {
-  return _gprs->_cell.write(b);
+  return _gprs->_cell->write(b);
 }
 size_t GPRSClient::write(const uint8_t *buf, size_t size) {
-  return _gprs->_cell.write(buf, size);
+  return _gprs->_cell->write(buf, size);
 }
 
 /**
@@ -43,12 +43,12 @@ int GPRSClient::available()
 {
 	// wait for reply
 	long _startTime = millis();		
-	while (_gprs->_cell.available() < 1){ 		    
+	while (_gprs->_cell->available() < 1){ 		    
 		if( (millis() - _startTime) > 250) {
 			 return 0; // timed out
 		} 
 	}
-	return _gprs->_cell.available();
+	return _gprs->_cell->available();
 }
 
 int GPRSClient::read(uint8_t *buf, size_t size)
@@ -69,17 +69,17 @@ int GPRSClient::read(uint8_t *buf, size_t size)
 
 int GPRSClient::read()
 {
-	return _gprs->_cell.read();;
+	return _gprs->_cell->read();;
 }
 
 int GPRSClient::peek()
 {
-	return _gprs->_cell.peek();;
+	return _gprs->_cell->peek();;
 }
 
 void GPRSClient::flush()
 {
-	_gprs->_cell.flush();
+	_gprs->_cell->flush();
 }
 
 GPRSClient::operator bool() {

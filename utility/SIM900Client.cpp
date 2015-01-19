@@ -17,7 +17,7 @@ ClientState_t SIM900Client::getClientState(void)
 void SIM900Client::beginWrite()
 {
 	// +CIPSEND
-	_gprs->_cell.println(F("AT+CIPSEND"));
+	_gprs->_cell->println(F("AT+CIPSEND"));
 
 	if(!_gprs->readAndCheckResponse(PSTR(">"))) {
 		// Serial.println(F("No >"));
@@ -43,12 +43,12 @@ void SIM900Client::endWrite()
 // To have easy to manage code we split that into internaConnect1 and internalConnect2
 void SIM900Client::internalConnect1() {
 	_gprs->detachGPRS();
-	_gprs->_cell.print(F("AT+CIPSTART=\"TCP\",\"")); // RETURNS: +CGATT: 1  OK	
+	_gprs->_cell->print(F("AT+CIPSTART=\"TCP\",\"")); // RETURNS: +CGATT: 1  OK	
 }
 // here is the host sent to modem
 int SIM900Client::internalConnect2(uint16_t port) {
-	_gprs->_cell.print(F("\","));
-	_gprs->_cell.println(port,DEC);
+	_gprs->_cell->print(F("\","));
+	_gprs->_cell->println(port,DEC);
 
 	if(!_gprs->successfulResponse()) {
 		return false;
@@ -56,7 +56,7 @@ int SIM900Client::internalConnect2(uint16_t port) {
 	
 	if(!_gprs->readAndCheckResponse(PSTR("CONNECT OK"), 0, 5000)) {
 		// if we did not get CONNECT OK something went wrong
-		_gprs->_cell.readBytes(_gprs->_buffer, _gprs->_bufferSize);
+		_gprs->_cell->readBytes(_gprs->_buffer, _gprs->_bufferSize);
 		// read the STATE in the response
 		char * stateStr = strstr_P(_gprs->_buffer, PSTR("STATE: "));
 		if(NULL!=stateStr) {
@@ -78,7 +78,7 @@ int SIM900Client::internalConnect2(uint16_t port) {
 int SIM900Client::connect(IPAddress ip, uint16_t port)
 { 
 	internalConnect1();
-	ip.printTo(_gprs->_cell);
+	//ip.printTo(_gprs->_cell); //FIX
 	return internalConnect2(port);
 }
 
@@ -88,7 +88,7 @@ int SIM900Client::connect(IPAddress ip, uint16_t port)
 int SIM900Client::connect(const char *host, uint16_t port)
 {
 	internalConnect1();
-	_gprs->_cell.print(host);
+	_gprs->_cell->print(host);
 	return internalConnect2(port);	
 }
 
@@ -98,7 +98,7 @@ int SIM900Client::connect(const char *host, uint16_t port)
 void SIM900Client::stop()
 {
 	if(SENDING == _state) {
-		_gprs->_cell.println('\032'); //	ctrl+z
+		_gprs->_cell->println('\032'); //	ctrl+z
 		// if successful a SEND OK will follow
 		// if not successful SEND FAIL or +CME ERROR <n> will follow
 		// after this TCP socket response will follow and end with a CLOSE if remote server closes connection
@@ -108,7 +108,7 @@ void SIM900Client::stop()
 	}
 	ConnectionStatus_t status = _gprs->getConnectionStatus();
 	if(CONNECT_OK==status || CONNECTING == status) {
-		_gprs->_cell.println(F("AT+CIPCLOSE"));
+		_gprs->_cell->println(F("AT+CIPCLOSE"));
 				
 		if(!_gprs->readAndCheckResponse(PSTR("CLOSE OK"), -1, 3000)) {
 			return;

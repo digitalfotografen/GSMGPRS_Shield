@@ -4,7 +4,9 @@
 #define GSM_RXPIN 7
 #define GSM_TXPIN 8
 
-GSM::GSM():_cell(GSM_TXPIN, GSM_RXPIN) {
+//GSM::GSM():_cell(GSM_TXPIN, GSM_RXPIN) {
+GSM::GSM() {
+  _cell = &Serial1;
 	_bufferSize = RESPONSE_BUFFER_SIZE;
 	_status = CONNECTING;
 }
@@ -15,7 +17,7 @@ void GSM::setBuffer(char * buffer, int size) {
 }
 
 void GSM::send(char * str) {
-	_cell.println(str);
+	_cell->println(str);
 }
 
 
@@ -55,8 +57,8 @@ bool GSM::readAndCheckResponse(const char* expected, int readBeyond, int timeout
 	while((millis() < _endTime)  &&
 	 			(_bufferIndex < _bufferSize) && 
 				(!found || (readBeyond != 0))) {
-		if((_cell.available()>0)) {
-			_buffer[_bufferIndex++] = _cell.read();
+		if((_cell->available()>0)) {
+			_buffer[_bufferIndex++] = _cell->read();
 			_buffer[_bufferIndex] = 0;
 			if(found && (readBeyond != -1)) {
 				readBeyond--;

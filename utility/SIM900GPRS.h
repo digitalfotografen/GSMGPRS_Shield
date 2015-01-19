@@ -5,6 +5,7 @@
 #define SIM900_GPRS_VERSION F("v0.1")
 
 #define GSM_ON_PIN             9 // connect GSM Module turn ON to pin 77 
+#define GSM_RESET_PIN          8 // connect GSM Module RESET to pin 35
 
 enum ConnectionStatus_t { 
 	IP_INITIAL, 

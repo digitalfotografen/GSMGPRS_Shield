@@ -20,7 +20,8 @@
 #define PINNUMBER ""
 
 // APN data
-#define GPRS_APN       "online.telia.se" // replace your GPRS APN
+//#define GPRS_APN       "online.telia.se" // replace your GPRS APN
+#define GPRS_APN       "internet.telenor.se" // replace your GPRS APN
 #define GPRS_LOGIN     ""                // replace with your GPRS login
 #define GPRS_PASSWORD  ""                // replace with your GPRS password
 

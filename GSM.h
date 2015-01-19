@@ -28,7 +28,8 @@ enum NetworkStatus_t {
 class GSM {
 
 protected:
-	SoftwareSerial _cell;
+	HardwareSerial *_cell;
+//	SoftwareSerial _cell;
 	char _internalBuffer[RESPONSE_BUFFER_SIZE];
 	char* _buffer = _internalBuffer;
 	int _bufferIndex = 0;
