@@ -4,6 +4,9 @@
 SIM900GPRS gsm;
 SIM900Client client(&gsm);
 
+#define APN "internet.telenor.se"
+//#define APN "online.telia.se"
+
 char http_cmd[] = "GET /test.html HTTP/1.0\r\nHost: www.yelloworb.com\r\n\r\n";
 
 #define BUFFER_SIZE 512
@@ -54,7 +57,7 @@ void setup(){
   }
   Serial.println(F("GPRS is available, attach!"));
   
-  while(GPRS_READY != gsm.attachGPRS("online.telia.se", NULL, NULL)) {
+  while(GPRS_READY != gsm.attachGPRS(APN, NULL, NULL)) {
       Serial.println("gprs join network error");
       goto STOP;
   }
