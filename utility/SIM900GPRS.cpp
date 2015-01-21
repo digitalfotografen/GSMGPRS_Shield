@@ -27,13 +27,30 @@ const char * const connectionStatusStrings[] PROGMEM =
 };
 
 #ifndef USE_HW_SERIAL
-SIM900GPRS::SIM900GPRS(long baudrate, int gprsBoardRXPin, int gprsBoardTXPin) {
+SIM900GPRS::SIM900GPRS(long baudrate, 
+                      int gprsBoardRXPin, 
+                      int gprsBoardTXPin,
+                      int gprsOnPin,
+                      int gprsResetPin){
   _cell = &_softwareSerial;
 #else
-SIM900GPRS::SIM900GPRS(long baudrate) {
+SIM900GPRS::SIM900GPRS(long baudrate,
+                      int gprsOnPin,
+                      int gprsResetPin){
   _cell = &Serial1;
 #endif
+
+  _gprsOnPin = gprsOnPin;
+  _gprsResetPin = gprsResetPin;
   _cell->begin(baudrate);
+  pinMode(_gprsOnPin, OUTPUT); 
+  digitalWrite(_gprsOnPin,LOW);  
+  if (_gprsResetPin > 0){
+    pinMode(_gprsResetPin, OUTPUT); 
+    digitalWrite(_gprsOnPin,LOW);
+  }
+
+//  _status = DEVICE_OFF;
 }
 
 /**
@@ -208,21 +225,17 @@ int SIM900GPRS::getSignalStrength(){
 			0..7 	as RXQUAL values in the table GSM 05-08 [20] subclause 7.2.4
 			99 		not knonw or detectable
 	*/
-	if(!successfulResponse()) { // no response
-		return 99;
-	}
-
-	char* end = strstr_P(_buffer, PSTR("OK"));
-	if(NULL == end ) {
-		return false;
-	}
-	end -=1;
-	end[0] = 0;
-	char* gprs = strchr(_buffer,':');
-	return atoi(gprs);
+  char* value = readAndGetValue(PSTR("CSQ:"), 2000);
+  if(value == NULL) { // no response
+    return 99;
+  }
+  Serial.println(value);
+  return atoi(value);
 }
 
-void cyclePowerOnOff() {
+
+
+void SIM900GPRS::cyclePowerOnOff() {
 	pinMode(GSM_ON_PIN, OUTPUT); 
 	digitalWrite(GSM_ON_PIN,LOW);
 	delay(1000);

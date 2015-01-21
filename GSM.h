@@ -30,6 +30,16 @@ enum NetworkStatus_t {
 	DEVICE_OFF
 };
 
+enum RegistrationStatus_t {
+  NOT_REGISTRED_NOT_SEARCHING,
+  REGISTRED_HOME,
+  NOT_REGISTRED_SEARCHING,
+  REGISTRATION_DENIED,
+  UNKNOWN,
+  ROAMING  
+};
+
+
 class GSM {
 
 protected:
@@ -46,7 +56,9 @@ protected:
 	NetworkStatus_t _status;
 
 	bool readAndCheckResponse(const char* expected, int readBeyond=-1, int timeout=TIMEOUT);
+	char* readAndGetValue(const char* expected, int timeout=TIMEOUT);
 	bool successfulResponse(int timeout=TIMEOUT);
+	void readToClear();
 	
 public:
 	GSM();

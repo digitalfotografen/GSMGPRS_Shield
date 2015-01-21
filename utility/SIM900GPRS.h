@@ -8,8 +8,10 @@
      #define USE_HW_SERIAL
 #endif
 
-#define GSM_ON_PIN             9 // connect GSM Module turn ON to pin 77 
-#define GSM_RESET_PIN          8 // connect GSM Module RESET to pin 35
+#define GSM_RX_PIN            7
+#define GSM_TX_PIN            8
+#define GSM_ON_PIN            9 // connect GSM Module turn ON to pin 77 
+#define GSM_RESET_PIN         -1 // default undefined
 
 enum ConnectionStatus_t { 
 	IP_INITIAL, 
@@ -28,17 +30,26 @@ enum ConnectionStatus_t {
 // this hardware implements both GSM and GPRS functionality, thus inherits from GPRS
 class SIM900GPRS : public GPRS {
 protected:
-	ConnectionStatus_t parseConnectionStatus(char * str);
-	ConnectionStatus_t getConnectionStatus();
+  int _gprsOnPin = GSM_ON_PIN;
+  int _gprsResetPin = GSM_RESET_PIN;
+  ConnectionStatus_t parseConnectionStatus(char * str);
+  ConnectionStatus_t getConnectionStatus();
+  //void cyclePowerOnOff();
 	
 public:
 #ifndef USE_HW_SERIAL
-	SIM900GPRS(long baudrate=9600, int gprsBoardRXPin=7, int gprsBoardTXPin=8);
+	SIM900GPRS(long baudrate=9600, 
+	            int gprsBoardRXPin=7, 
+	            int gprsBoardTXPin=8,
+	            int gprsOnPin=GSM_ON_PIN,
+	            int gprsResetPin=GSM_RESET_PIN);
 #else
-	SIM900GPRS(long baudrate=9600);
+	SIM900GPRS(long baudrate=9600,
+	            int gprsOnPin = GSM_ON_PIN,
+	            int gprsResetPin = GSM_RESET_PIN);
 #endif
 
-	NetworkStatus_t begin(char* pin=NULL, bool restart=true);
+	virtual NetworkStatus_t begin(char* pin=NULL, bool restart=true);
 	
 	bool isGPRSAvailable();
 	NetworkStatus_t attachGPRS(const char * const domain, const char * const username=NULL, const char * const  password=NULL);
@@ -49,7 +60,12 @@ public:
 	
 	bool turnOn();
 	bool shutdown();
-	
+  void reset();
+  void cyclePowerOnOff();
+  	
+  RegistrationStatus_t getRegistrationStatus();
+  bool registerToNetwork();
+
 	int getSignalStrength();
 	
 	void activateGPRS();

@@ -110,10 +110,66 @@ bool GSM::readAndCheckResponse(const char* expected, int readBeyond, int timeout
 	return found;
 }
 
+char* GSM::readAndGetValue(const char* expected, int timeout)
+{
+  long endTime = millis()+timeout;
+  char* ptr = NULL;
+  boolean eol = false;
+
+  if (readAndCheckResponse(expected, 0, timeout)){
+    ptr = _buffer + _bufferIndex;
+    while ((millis() < endTime) && (_bufferIndex < _bufferSize) && (!eol)){
+      if(_cell->available()){
+         _buffer[_bufferIndex] = _cell->read();
+         if(_buffer[_bufferIndex] == '/r'){
+            eol = true;
+            _buffer[_bufferIndex] = 0x00;
+            
+         } else {
+            _buffer[++_bufferIndex] = 0x00;
+         }
+      }
+    }
+  } else {
+    ptr = NULL; //not found
+#ifdef DEBUG
+    Serial.print("Value of ");
+    print_P(expected);
+    Serial.println(" not found!");
+#endif
+  }
+  
+/*
+  if (endTime > millis()) {
+    ptr = NULL; //timeout
+#ifdef DEBUG
+    Serial.print("Value of ");
+    print_P(expected);
+    Serial.println(" timout!");
+#endif
+  }
+*/  
+#ifdef DEBUG
+  Serial.print(ptr);
+  Serial.print("Value of ");
+  print_P(expected);
+  Serial.print(" is :");
+  Serial.println(ptr);
+#endif
+  return ptr;
+}
+
 bool GSM::successfulResponse(int timeout) 
 {
 	return readAndCheckResponse(PSTR("OK\r\n"), -1, timeout);
 }
+
+void GSM::readToClear(){
+  while(_cell->available()){
+    Serial.print(_cell->read());
+  }
+}
+
 
 NetworkStatus_t GSM::getNetworkStatus(void) {
 	return _status;
